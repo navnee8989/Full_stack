@@ -2,25 +2,34 @@
   width: 1200px;
   margin: 0 auto;
 }
+select {
+  border-radius: 5px;
+  padding: 0px 20px;
+}
+select option {
+  border-radius: 10px;
+}
+.paading{
+    padding: 0px 20px;
+}
 .booking {
-
-    width: 100%;
-    height: 100vh;
+  width: 100%;
+  height: 100vh;
   background-color: #ecece5;
   padding-top: 30px;
 }
-.tabs{
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    gap: 20px;
+.tabs {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 20px;
 }
 .tabs button {
   font-weight: 700;
   text-transform: uppercase;
   padding: 5px 30px;
   border-radius: 20px;
-border: 1px solid rgb(179, 179, 179);
+  border: 1px solid rgb(179, 179, 179);
 
   font-size: 13px;
 }
@@ -28,13 +37,33 @@ border: 1px solid rgb(179, 179, 179);
   background-color: rgba(45, 107, 223, 0.89);
 }
 
-.booking form{
-    padding-top: 60px;
-   
+.booking form {
+  margin-top: 60px;
+  background-color: white;
 }
-.booking form .from{
-    width: 200px;
-    background-color: white;
-    display: flex;
-    flex-direction: column;
+
+.booking form .from {
+  width: 200px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+.btn_div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+}
+.btn_div button {
+  background: rgb(207, 50, 50);
+  width: 120px;
+  padding: 15px 0px;
+}
+.btn_div button span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  gap: 8px;
 }

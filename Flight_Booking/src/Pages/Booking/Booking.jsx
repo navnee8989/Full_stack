@@ -2,6 +2,10 @@ import { useState } from "react";
 import "./Booking.css";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
+import {
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardDoubleArrowRight,
+} from "react-icons/md";
 
 const Booking = () => {
   const [formData, setFormData] = useState({
@@ -163,6 +167,21 @@ const Booking = () => {
             </div>
           </div>
         </form>
+        <hr />
+        <div className="page_move">
+          <button className="prev">
+            <div className="lefticon">
+              <MdKeyboardDoubleArrowLeft />
+            </div>
+            <strong>PREV DAY</strong>
+          </button>
+          <button className="next">
+            <strong>NEXT DAY</strong>
+            <div className="righticon">
+              <MdKeyboardDoubleArrowRight />
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   );

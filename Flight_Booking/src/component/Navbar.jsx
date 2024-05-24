@@ -38,10 +38,10 @@ const Navbar = () => {
             <span>Gruop Request</span>  
             </div>
           </div>
-          <div className="links_inside">
+          <div className="links_inside_balance">
           
-            <div className="text">
-            <span className="">Balance <span className="text-orange-400">$1</span></span>  
+            <div className="balance">
+            <span className="">Balance <span className="text-orange-400 price">$1</span></span>  
             </div>
           </div>
         </div>

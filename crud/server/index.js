@@ -1,21 +1,19 @@
 const express = require("express");
-const cors = require('cors');
+const morgan = require("morgan");
+const colors = require("colors");
+const cors = require("cors");
+
 const app = express();
-const PORT = 5000;
-const db = require('./models');
-const { sequelize } = db;
-const bodyParser = require('body-parser');
+require('dotenv').config()
 
-app.use(express.json());
+//MiddleWare
+//Cross browser
 app.use(cors());
-app.use(bodyParser.json()); 
+//add Morgan to View API response in Log
+app.use(morgan("dev"));
 
+const PORT = process.env.PORT || 5000;
 
-const postRouter = require('./routes/Posts');
-app.use('/posts', postRouter);
-
-sequelize.sync().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+app.listen(PORT, () => {
+  console.info(`Server Connected To ${PORT}`.bgCyan);
 });

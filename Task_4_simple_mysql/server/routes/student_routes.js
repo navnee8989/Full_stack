@@ -14,5 +14,8 @@ router.get('/studentlist',getStudent)
 router.get("/studentlist/:id",getStudnetByID)
 
 
+// Delete Student By ID
+router.delete('/studentlist/:id')
+
 
 module.exports = router

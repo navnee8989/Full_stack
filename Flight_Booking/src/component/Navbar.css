@@ -1,0 +1,33 @@
+header {
+  width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-evenly;
+  padding-top: 10px;
+}
+.head {
+  padding: 20px;
+}
+.links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+.links .links_inside {
+  background-color: rgba(187, 228, 214, 0.815);
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 7px;
+  gap: 10px;
+  border-radius: 5px;
+  padding-bottom: 10px;
+  width: 150px;
+}
+.links .links_inside .text span {
+  font-size: 14px;
+}
+.links .links_inside .icons svg {
+  width: 20px;
+}

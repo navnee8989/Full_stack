@@ -1,0 +1,40 @@
+.container {
+  width: 1200px;
+  margin: 0 auto;
+}
+.booking {
+
+    width: 100%;
+    height: 100vh;
+  background-color: #ecece5;
+  padding-top: 30px;
+}
+.tabs{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 20px;
+}
+.tabs button {
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 5px 30px;
+  border-radius: 20px;
+border: 1px solid rgb(179, 179, 179);
+
+  font-size: 13px;
+}
+.tabs .one {
+  background-color: rgba(45, 107, 223, 0.89);
+}
+
+.booking form{
+    padding-top: 60px;
+   
+}
+.booking form .from{
+    width: 200px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}

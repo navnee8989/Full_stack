@@ -1,15 +1,20 @@
 const express = require("express");
+const cors = require('cors')
 const colors = require("colors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const mysqlPool = require("./config/db");
 const app = express();
 
+
+
+
 // Configure dotenv
 dotenv.config();
 
 // Middleware
 app.use(morgan("dev"));
+app.use(cors())
 
 // Routes
 app.use("/api/v1/student", require("./routes/student_routes"));

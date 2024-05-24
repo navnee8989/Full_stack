@@ -31,25 +31,26 @@ const getStudnetByID = async (req, res) => {
   try {
     const StudentID = req.params.id;
     if (!StudentID) {
-       return res.status(404).send({
-            success: false,
-            message: " Student By ID Not Found",
-            
-        })
+      return res.status(404).send({
+        success: false,
+        message: " Student By ID Not Found",
+      });
     }
-    const data = await db.query(`SELECT * FROM student_db.student_data WHERE id=?`,[StudentID])
+    const data = await db.query(
+      `SELECT * FROM student_db.student_data WHERE id=?`,
+      [StudentID]
+    );
     if (!data || data.length === 0) {
-        res.status(404).send({
-            success: false,
-            message: "No record Found",
-            error: error.message,
-          });
+      res.status(404).send({
+        success: false,
+        message: "No record Found",
+        error: error.message,
+      });
     }
     res.status(200).send({
-        success: true,
-        data: data[0]
-    })
-
+      success: true,
+      data: data[0],
+    });
   } catch (error) {
     console.error("Error in Get All Student By ID:", error);
     res.status(500).send({
@@ -57,6 +58,39 @@ const getStudnetByID = async (req, res) => {
       message: "Error in Get All Student By ID",
       error: error.message,
     });
+  }
+};
+
+// Delete Student By ID
+
+const deleteStudentByID = async (req, res) => {
+  try {
+    const StudentID = req.params.id;
+    if (!StudentID) {
+      return res.status(404).send({
+        success: false,
+        message: " Student By ID Not Found",
+      });
+    }
+    const [data] = await db.query(`SELECT * FROM student_db.student_data WHERE id=?`,[StudentID])
+    if(!data || data.length === 0){
+      res.status(404).send({
+        success: false,
+        massege: "Data Not Found in Delete User",
+        error: error.message
+      })
+    }
+    res.status(200).send({
+      success: true,
+      massege: "Delete User ",
+      data: data
+    })
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      massege: "This Error From Deleting User ",
+      error: error.message
+    })
   }
 };
 

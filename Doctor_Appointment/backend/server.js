@@ -3,7 +3,7 @@ const colors = require('colors')
 const morgan = require("morgan")
 const {config} = require('dotenv')
 const connectDB = require('./config/db')
-
+const userRouter = require('./routes/userRoute')
 
 
 
@@ -19,12 +19,7 @@ connectDB()
 
 
 //Routes
-
-app.get('/',(req,res)=>{
-    res.status(200).send({
-        massege: "Server Start in HomePage"
-    })
-})
+app.use('/api/users',userRouter)
 
 const PORT = process.env.PORT || 2589
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Booking.css";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
@@ -8,38 +8,63 @@ import {
 } from "react-icons/md";
 
 const Booking = () => {
+  const getData = async () => {
+    try {
+      const response = await axios.get(
+        "https://travel-advisor.p.rapidapi.com/locations/v2/auto-complete",
+        {
+          params: {
+            query: "eiffel tower",
+            lang: "en_US",
+            units: "km",
+          },
+          headers: {
+            "X-RapidAPI-Key": "e23c6309bamsha388f1a2811bf9fp154e3bjsn46aa6d93efb1",
+            "X-RapidAPI-Host": "travel-advisor.p.rapidapi.com",
+          },
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const [formData, setFormData] = useState({
     origin: "",
     destination: "",
     departure_date: "",
-    adult: "",
-    child: "",
-    infant: "",
+    adults: 1,
+    children: 0,
+    infants: 0,
   });
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
+
     const data = {
       origin: formData.origin,
       destination: formData.destination,
       departure_date: formData.departure_date,
-      adult: formData.adult,
-      child: formData.child,
-      infant: formData.infant,
+      adults: formData.adults,
+      children: formData.children,
+      infants: formData.infants,
       airline_code: "UK",
     };
 
-
-    //Add Headers Into This 
     const headers = {};
 
     try {
-      //I Use React Proxy to API URL Check the package.Json file In the Last
       const response = await axios.post("/search", data, { headers });
       console.log(response.data);
     } catch (error) {
@@ -51,52 +76,48 @@ const Booking = () => {
     <div className="booking">
       <div className="container">
         <div className="tabs">
-          <button className="one">oneway</button>
-          <button className="two">round trip</button>
+          <button className="one">One Way</button>
+          <button className="two">Round Trip</button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col md:flex-row">
             <div className="py-1.5 px-2.5 flex-1 border-r-2">
               <p>From</p>
-              <div className="flex flex-row">
-                <select
-                  className="outline-none px-2 py-2 w-full"
-                  name="origin"
-                  value={formData.origin}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" hidden>
-                    ORIGIN
-                  </option>
-                  <option>AMD</option>
-                  <option>DEL</option>
-                  <option>LEI</option>
-                  <option>AOO</option>
-                </select>
-              </div>
+              <select
+                className="outline-none px-2 py-2 w-full"
+                name="origin"
+                value={formData.origin}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="" hidden>
+                  ORIGIN
+                </option>
+                <option value="AMD">AMD</option>
+                <option value="DEL">DEL</option>
+                <option value="LEI">LEI</option>
+                <option value="AOO">AOO</option>
+              </select>
             </div>
 
             <div className="py-1.5 px-2.5 flex-1 border-r-2">
               <p>To</p>
-              <div className="flex flex-row">
-                <select
-                  className="outline-none px-2 py-2 w-full"
-                  name="destination"
-                  value={formData.destination}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" hidden>
-                    Destination
-                  </option>
-                  <option>AMD</option>
-                  <option>DEL</option>
-                  <option>LEI</option>
-                  <option>AOO</option>
-                </select>
-              </div>
+              <select
+                className="outline-none px-2 py-2 w-full"
+                name="destination"
+                value={formData.destination}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="" hidden>
+                  DESTINATION
+                </option>
+                <option value="AMD">AMD</option>
+                <option value="DEL">DEL</option>
+                <option value="LEI">LEI</option>
+                <option value="AOO">AOO</option>
+              </select>
             </div>
 
             <div className="py-1.5 px-2.5 flex-1 border-r-2">
@@ -113,56 +134,56 @@ const Booking = () => {
 
             <div className="py-1.5 px-2.5 flex-1 border-r-2">
               <p>PAX SIZE</p>
-              <div className="flex flex-row select_r">
-                <select
-                  className="outline-none px-2 py-2 w-full "
-                  name="adult"
-                  value={formData.adult}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" hidden>
-                    Adult
-                  </option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-
-                <select
-                  className="outline-none px-2 py-2 w-full padding"
-                  name="child"
-                  value={formData.child}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" hidden>
-                    Child
-                  </option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-
-                <select
-                  className="outline-none px-2 py-2 w-full padding"
-                  name="infant"
-                  value={formData.infant}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" hidden>
-                    Infant
-                  </option>
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                </select>
+              <div className="pax-dropdown">
+                <button type="button" className="outline-none px-2 py-2 w-full">
+                  PAX SIZE
+                </button>
+                <div className="pax-dropdown-content">
+                  <div className="py-1.5">
+                    <p>Adults</p>
+                    <input
+                      type="number"
+                      className="outline-none px-2 py-2 w-full"
+                      name="adults"
+                      value={formData.adults}
+                      onChange={handleInputChange}
+                      min={1}
+                      max={5}
+                      required
+                    />
+                  </div>
+                  <div className="py-1.5">
+                    <p>Children</p>
+                    <input
+                      type="number"
+                      className="outline-none px-2 py-2 w-full"
+                      name="children"
+                      value={formData.children}
+                      onChange={handleInputChange}
+                      min={0}
+                      max={5}
+                      required
+                    />
+                  </div>
+                  <div className="py-1.5">
+                    <p>Infants</p>
+                    <input
+                      type="number"
+                      className="outline-none px-2 py-2 w-full"
+                      name="infants"
+                      value={formData.infants}
+                      onChange={handleInputChange}
+                      min={0}
+                      max={5}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="btn_div">
-              <button className=" bg-indigo-500 text-white " type="submit">
+              <button className="bg-indigo-500 text-white" type="submit">
                 <span className="text-sm">
                   Search <FaSearch />
                 </span>

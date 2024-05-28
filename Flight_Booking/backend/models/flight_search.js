@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     tickets: {
-      type: DataTypes.JSONB,
+      type: DataTypes.JSON,
       allowNull: false,
       defaultValue: [],
       set(tickets) {

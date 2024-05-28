@@ -2,22 +2,28 @@ import React from "react";
 import { Button, Checkbox, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/Register.css";
+import {useDispatch} from 'react-redux'
 import axios from "axios";
 import { toast } from "react-toastify";
+import { hideLoading, showLoading } from "../redux/slice/AlertSlice";
 
 const Register = () => {
+  const dipatch = useDispatch()
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
     try {
+      dipatch(showLoading())
       const response = await axios.post('/api/users/register', values);
+      dipatch(hideLoading())
       if (response.data.success) {
         message.success("Registered Successfully");
-        const {email} = response.data.data
-        toast.success(`Registration Complate With ${email}`)
+        
+        toast.success(`Registration Complate With `)
         navigate('/login');
       }
     } catch (error) {
+      dipatch(hideLoading())
       console.log(error);
       message.error("Something went wrong on the Register page");
     }

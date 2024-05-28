@@ -2,20 +2,36 @@ import React from "react";
 import { Button, Checkbox, Form, Input, message } from "antd";
 import "../styles/Register.css";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { showLoading, hideLoading } from "../redux/slice/AlertSlice";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 const Login = () => {
+  const dipatch = useDispatch();
+  const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
       const res = await axios.post("/api/users/login", values);
-      const { email } = res.data.data;
+      dipatch(showLoading());
+      const token = res.data.data;
+      // console.log(token);
+      // console.log(res.data);
       if (!res.data.success) {
-        message.error(`Login Failed With ${email}`);
-        toast.error(`Error While Login ${email}`);
+        message.error(`Login Failed With `);
+        toast.error(`Error While Login `);
+        dipatch(hideLoading());
       } else {
-        toast.success(`User Login Successfull with ${email}`);
+        localStorage.setItem("token", token);
+        // const { username } = res.data.data;
+       
+        // console.info(token,username);
+        toast.success(`User Login Successfull with `);
+
+        navigate("/");
       }
     } catch (error) {
+      dipatch(hideLoading());
+
       console.log(error);
       toast.error("Error While Login");
     }

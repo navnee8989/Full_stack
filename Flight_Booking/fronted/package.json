@@ -1,5 +1,6 @@
 {
   "name": "my-app",
+  "proxy": "https://omairiq.azurewebsites.net",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -42,6 +43,5 @@
   },
   "devDependencies": {
     "tailwindcss": "^3.4.3"
-  },
-  "proxy": "https://omairiq.azurewebsites.net"
+  }
 }

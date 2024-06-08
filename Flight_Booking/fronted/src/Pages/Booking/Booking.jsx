@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./Booking.css";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
@@ -8,37 +8,11 @@ import {
 } from "react-icons/md";
 
 const Booking = () => {
-  const getData = async () => {
-    try {
-      const response = await axios.get(
-        "https://travel-advisor.p.rapidapi.com/locations/v2/auto-complete",
-        {
-          params: {
-            query: "eiffel tower",
-            lang: "en_US",
-            units: "km",
-          },
-          headers: {
-            "X-RapidAPI-Key": "e23c6309bamsha388f1a2811bf9fp154e3bjsn46aa6d93efb1",
-            "X-RapidAPI-Host": "travel-advisor.p.rapidapi.com",
-          },
-        }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
   const [formData, setFormData] = useState({
     origin: "",
     destination: "",
     departure_date: "",
-    adults: 1,
+    adults: 0,
     children: 0,
     infants: 0,
   });
@@ -47,29 +21,38 @@ const Booking = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+console.log(formData);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-
-    const data = {
-      origin: formData.origin,
-      destination: formData.destination,
-      departure_date: formData.departure_date,
-      adults: formData.adults,
-      children: formData.children,
-      infants: formData.infants,
-      airline_code: "UK",
-    };
-
-    const headers = {};
-
-    try {
-      const response = await axios.post("/search", data, { headers });
+  
+   try {
+    let data = JSON.stringify({
+      "origin": "AMD",
+      "destination": "DEL",
+      "departure_date": "2024/06/12",
+      "adult": "1",
+      "child": "1",
+      "infant": "1",
+      "airline_code": "UK"
+    });
+    const response = await axios.post('/search',data,{
+      headers:{
+        'api-key': 'NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlFRYjhLVjNFMW9UV05RY1NWL0Vtcm9UYXFKTSs5dkZvaHo0RzM4WWhwTDhsamNqR3pPN1dJSHhVQ2pCSzNRcW0=', 
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJqdGkiOiJlOTU2Mjc0OC1hYjQwLTQwNWUtYjQxMS1jY2NlODQxNTE4YzkiLCJ1c2VyTmFtZSI6Ijk1NTUyMDIyMDIiLCJhcGlrZXkiOiJOVE16TkRVd01EcEJTVkpKVVNCVVJWTlVJRUZRU1RveE9Ea3hPVE13TURNMU9UazJPbEZSWWpoTFZqTkZNVzlVVjA1UlkxTldMMFZ0Y205VVlYRktUU3M1ZGtadmFIbzBSek00V1dod1REaHNhbU5xUjNwUE4xZEpTSGhWUTJwQ1N6TlJjVzA9IiwiZXhwIjoxNzE3ODUxMjU4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjU2MTczLyIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTYxNzMvIn0.X8ijqeT_uQEJdcMiM-HRcNZIYqKa0T9OXDVRrFsuuQU', 
+        'Content-Type': 'application/json',
+      }
+    })
+    if (!response.data) {
+      console.log("error while fatching");
+    }else{
       console.log(response.data);
-    } catch (error) {
-      console.error("There was an error making the request:", error);
     }
+   } catch (error) {
+    
+   }
+  
+    
+   
   };
 
   return (

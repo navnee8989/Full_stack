@@ -10,9 +10,9 @@ const Navbar = () => {
 
   return (
     <>
-    <div className="head ">
+    <div className="head-section">
 
-      <header className="pt-2 d-flex  justify-between items-center">
+      <header className="pt-2 d-flex  justify-between items-center ">
         <div className="logo text-red-500 text-5xl font-bold ">
           <span className="text-blue-600 pr-4">AIR</span>IQ
         </div>
@@ -46,7 +46,7 @@ const Navbar = () => {
           </div>
         </div>
         
-        {isMenuOpen && (
+        {/* {isMenuOpen && (
           <div className="menu" >
             <ul>
               <li>Link 1</li>
@@ -54,7 +54,7 @@ const Navbar = () => {
               <li>Link 3</li>
             </ul>
           </div>
-        )}
+        )} */}
       </header>
     </div>
     </>

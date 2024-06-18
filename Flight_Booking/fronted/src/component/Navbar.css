@@ -1,12 +1,17 @@
 header {
-  width: 1200px;
+  width: 75%;
   margin: 0 auto;
+
   display: flex;
   justify-content: space-evenly;
   padding-top: 10px;
 }
-.head {
-  padding: 20px;
+.head-section {
+width: 100vw;
+padding: 20px;
+padding-bottom: 40px;
+/* background: gold; */
+
 }
 .links {
   display: flex;
@@ -45,4 +50,13 @@ header {
 }
 .balance .price{
   letter-spacing: 2px;
+}
+
+
+.loader{
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

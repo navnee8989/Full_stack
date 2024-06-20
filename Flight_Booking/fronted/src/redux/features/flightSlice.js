@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  loginDetails: null,
+  loginDetails: [],
   allData: null,
   allFlightData: [],
   adultCountData: 1,
@@ -19,7 +19,7 @@ const flightSlice = createSlice({
   initialState,
   reducers: {
     setLoginDetails: (state, action) => {
-      state.loginDetails = action.payload;
+      state.loginDetails.push({...action.payload})
     },
     setallData(state, action) {
       state.allData = action.payload;
@@ -54,7 +54,7 @@ export const {
   setinfantCountData,
   setdepartureDateNew,
   setLoginDetails,
-  setgetTicketInfo
+  setgetTicketInfo,
 } = flightSlice.actions;
 
 export default flightSlice.reducer;

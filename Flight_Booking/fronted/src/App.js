@@ -7,8 +7,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Loader from "./component/Loader.jsx";
-import { User } from "./User/User.jsx";
-import BookDetails from "./User/BookDetails.jsx";
+import User from './Pages/User/User.jsx'
+import BookDetails from "./Pages/User/BookDetails.jsx";
 
 // Lazy-loaded components
 const DashBoard = lazy(() => import("./Pages/Dashboard/DashBoard.jsx"));
@@ -31,7 +31,6 @@ const App = () => {
             <Route path="/user" element={<User />} />
             <Route path="/bookdetails" element={<BookDetails />} />
           </Route>
-        
           <Route path="/availability/:id" element={<Availability />} />
           <Route path="/formpayment" element={<FormPayment />} />
           <Route path="/booking" element={<Booking />} />

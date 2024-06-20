@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MdOutlineFlight } from "react-icons/md";
 import "./Avilibity.css";
 import { FaIoxhost } from "react-icons/fa";
@@ -19,6 +19,7 @@ const Availability = () => {
   const [formData, setFormData] = useState({
     adults: [],
     children: [],
+    infants: [],
     agreeToTerms: false,
   });
 
@@ -28,8 +29,16 @@ const Availability = () => {
   const infantCountData = useSelector((state) => state.flight.infantCountData);
   const location = useLocation();
   const AllFlightData = location.state?.ticket;
-  console.log(AllFlightData);
-  const [incount, setincout] = useState(infantCountData);
+
+  useEffect(() => {
+    setFormData({
+      ...formData,
+      adults: Array(adultCountData).fill({}),
+      children: Array(childCountData).fill({}),
+      infants: Array(infantCountData).fill({}),
+    });
+  }, [adultCountData, childCountData, infantCountData]);
+
   const handleInputChange = (e, index, type) => {
     const { name, value } = e.target;
     setFormData((prevState) => {
@@ -53,7 +62,10 @@ const Availability = () => {
   };
 
   const handleInfant = () => {
-    setincout(infantCountData + 1);
+    setFormData((prevState) => ({
+      ...prevState,
+      infants: [...prevState.infants, {}],
+    }));
     setInfantShow(true);
   };
 
@@ -64,14 +76,14 @@ const Availability = () => {
     }
 
     const totalPax =
-      Number(adultCountData) + Number(childCountData) + Number(infantCountData);
+      Number(adultCountData) + Number(childCountData) + Number(formData.infants.length);
 
-    const data = {
+    const data = JSON.stringify({
       ticket_id: AllFlightData?.ticket_id,
       total_pax: totalPax,
       adult: adultCountData,
       child: childCountData,
-      infant: infantCountData,
+      infant: formData.infants.length,
       adult_info: formData.adults.map((adult) => ({
         title: adult.title,
         first_name: adult.firstName,
@@ -82,13 +94,17 @@ const Availability = () => {
         first_name: child.firstName,
         last_name: child.lastName,
       })),
-    };
+      infant_info: formData.infants.map((infant) => ({
+        title: infant.title,
+        first_name: infant.firstName,
+        last_name: infant.lastName,
+      })),
+    });
 
     try {
-      const response = await axios.post("/api/book", JSON.stringify(data), {
+      const response = await axios.post("/api/book", data, {
         headers: {
-          "api-key":
-            "NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlFRYjhLVjNFMW9UV05RY1NWL0Vtcm9UYXFKTSs5dkZvaHo0RzM4WWhwTDhsamNqR3pPN1dJSHhVQ2pCSzNRcW0=",
+          "api-key": "NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlFRYjhLVjNFMW9UV05RY1NWL0Vtcm9UYXFKTSs5dkZvaHo0RzM4WWhwTDhsamNqR3pPN1dJSHhVQ2pCSzNRcW0=",
           Authorization: `${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
@@ -96,8 +112,7 @@ const Availability = () => {
 
       if (response?.data) {
         toast.success("Booking confirmed!");
-        navigate("/formpayment",{state: {data: response.data}});
-        console.log(response.data);
+        navigate("/formpayment", { state: { data: response.data } });
       } else {
         toast.error("Error while booking the ticket.");
       }
@@ -108,159 +123,84 @@ const Availability = () => {
 
   return (
     <>
-
-    <Navbar />
-    <div className="tickets pt-16">
-      <div className="container">
-        <div className="origin_destination d-flex justify-start items-center">
-          <strong>
-            <MdOutlineFlight />
-          </strong>
-          <div className="flightRoutes">
-            <b>{AllFlightData.origin}</b>
-            <span>---</span>
-            <b>{AllFlightData.destination}</b>
-          </div>
-        </div>
-        <div className="ticketDetails border shadow-lg border-sm w-full d-flex justify-between items-center mt-5 p-4">
-          <div className="iconsF d-flex flex-col">
-            <FaIoxhost />
-            <span>{AllFlightData.airline}</span>
-          </div>
-          <div className="flight_route">{AllFlightData.flight_route}</div>
-          <div className="flight_number">{AllFlightData.flight_number}</div>
-          <div className="time">
-            <span>{AllFlightData.departure_time}</span>--
-            <span>{AllFlightData.arrival_time}</span>
-          </div>
-          <div className="seat">Seats-{AllFlightData.pax}</div>
-          <div className="code d-flex justify-between items-center gap-10">
-            <div className="tourCode d-flex flex-col">
-              <span>Tour Code</span>
-              <strong>AQP{AllFlightData.price}</strong>
-            </div>
-            <div className="tourCodetwo d-flex flex-col">
-              <span>Tour Code</span>
-              <strong>AQP{AllFlightData.price}</strong>
+      <Navbar />
+      <div className="tickets pt-16">
+        <div className="container">
+          <div className="origin_destination d-flex justify-start items-center">
+            <strong>
+              <MdOutlineFlight />
+            </strong>
+            <div className="flightRoutes">
+              <b>{AllFlightData.origin}</b>
+              <span>---</span>
+              <b>{AllFlightData.destination}</b>
             </div>
           </div>
-        </div>
-
-        <h1 className="w-full text-center text-2xl pt-10">Adult Booking</h1>
-        {Array.from({ length: adultCountData }).map((_, index) => (
-          <div
-            key={index}
-            className="bookingForm mt-10 shadow-md w-full d-flex justify-between items-center pl-8 pr-8 pt-3 pb-3 border"
-          >
-            <div className="dropdown d-flex justify-between items-center w-25 gap-5">
-              <div className="people w-full">
-                <MDBDropdown className="">
-                  <MDBDropdownToggle className="bg-dark w-full">
-                    Adult
-                  </MDBDropdownToggle>
-                  <MDBDropdownMenu>
-                    <MDBDropdownItem link>Adult</MDBDropdownItem>
-                  </MDBDropdownMenu>
-                </MDBDropdown>
+          <div className="ticketDetails border shadow-lg border-sm w-full d-flex justify-between items-center mt-5 p-4">
+            <div className="iconsF d-flex flex-col">
+              <FaIoxhost />
+              <span>{AllFlightData.airline}</span>
+            </div>
+            <div className="flight_route">{AllFlightData.flight_route}</div>
+            <div className="flight_number">{AllFlightData.flight_number}</div>
+            <div className="time">
+              <span>{AllFlightData.departure_time}</span>--
+              <span>{AllFlightData.arrival_time}</span>
+            </div>
+            <div className="seat">Seats-{AllFlightData.pax}</div>
+            <div className="code d-flex justify-between items-center gap-10">
+              <div className="tourCode d-flex flex-col">
+                <span>Tour Code</span>
+                <strong>AQP{AllFlightData.price}</strong>
+              </div>
+              <div className="tourCodetwo d-flex flex-col">
+                <span>Tour Code</span>
+                <strong>AQP{AllFlightData.price}</strong>
               </div>
             </div>
-            <div className="form w-full d-flex justify-evenly">
-              <form className="d-flex justify-between items-center gap-12">
-                <div className="mb-3 w-50">
-                  <label
-                    htmlFor={`titleInputAdult${index}`}
-                    className="form-label"
-                  >
-                    Title
-                  </label>
-                  <select
-                    className="form-select"
-                    id={`titleInputAdult${index}`}
-                    name="title"
-                    onChange={(e) => handleInputChange(e, index, "adults")}
-                  >
-                    <option value="">Select</option>
-                    <option value="Mr.">Mr.</option>
-                    <option value="Mrs.">Mrs.</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label
-                    htmlFor={`firstNameInputAdult${index}`}
-                    className="form-label"
-                  >
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id={`firstNameInputAdult${index}`}
-                    name="firstName"
-                    onChange={(e) => handleInputChange(e, index, "adults")}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label
-                    htmlFor={`lastNameInputAdult${index}`}
-                    className="form-label"
-                  >
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id={`lastNameInputAdult${index}`}
-                    name="lastName"
-                    onChange={(e) => handleInputChange(e, index, "adults")}
-                  />
-                </div>
-              </form>
-            </div>
           </div>
-        ))}
 
-        {Array.from({ length: childCountData }).map((_, index) => (
-          <>
-            <h1 className="w-full text-center text-2xl pt-10">Child Booking</h1>
+          <h1 className="w-full text-center text-2xl pt-10">Adult Booking</h1>
+          {formData.adults.map((_, index) => (
             <div
               key={index}
-              className="bookingForm mt-10 shadow-md w-full d-flex justify-evenly items-center pl-8 pr-8 pt-3 pb-3 border"
+              className="bookingForm mt-10 shadow-md w-full d-flex justify-between items-center pl-8 pr-8 pt-3 pb-3 border"
             >
               <div className="dropdown d-flex justify-between items-center w-25 gap-5">
                 <div className="people w-full">
                   <MDBDropdown className="">
                     <MDBDropdownToggle className="bg-dark w-full">
-                      Child
+                      Adult
                     </MDBDropdownToggle>
                     <MDBDropdownMenu>
-                      <MDBDropdownItem link>Child</MDBDropdownItem>
+                      <MDBDropdownItem link>Adult</MDBDropdownItem>
                     </MDBDropdownMenu>
                   </MDBDropdown>
                 </div>
               </div>
-              <div className="form w-full d-flex justify-evenly ">
+              <div className="form w-full d-flex justify-evenly">
                 <form className="d-flex justify-between items-center gap-12">
                   <div className="mb-3 w-50">
                     <label
-                      htmlFor={`titleInputChild${index}`}
+                      htmlFor={`titleInputAdult${index}`}
                       className="form-label"
                     >
                       Title
                     </label>
                     <select
                       className="form-select"
-                      id={`titleInputChild${index}`}
+                      id={`titleInputAdult${index}`}
                       name="title"
-                      onChange={(e) => handleInputChange(e, index, "children")}
+                      onChange={(e) => handleInputChange(e, index, "adults")}
                     >
                       <option value="">Select</option>
-                      <option value="Mstr.">Mstr.</option>
-                      <option value="Miss">Miss</option>
+                      <option value="Mr.">Mr.</option>
+                      <option value="Mrs.">Mrs.</option>
                     </select>
                   </div>
                   <div className="mb-3">
                     <label
-                      htmlFor={`firstNameInputChild${index}`}
+                      htmlFor={`firstNameInputAdult${index}`}
                       className="form-label"
                     >
                       First Name
@@ -268,14 +208,14 @@ const Availability = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id={`firstNameInputChild${index}`}
+                      id={`firstNameInputAdult${index}`}
                       name="firstName"
-                      onChange={(e) => handleInputChange(e, index, "children")}
+                      onChange={(e) => handleInputChange(e, index, "adults")}
                     />
                   </div>
                   <div className="mb-3">
                     <label
-                      htmlFor={`lastNameInputChild${index}`}
+                      htmlFor={`lastNameInputAdult${index}`}
                       className="form-label"
                     >
                       Last Name
@@ -283,132 +223,220 @@ const Availability = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id={`lastNameInputChild${index}`}
+                      id={`lastNameInputAdult${index}`}
                       name="lastName"
-                      onChange={(e) => handleInputChange(e, index, "children")}
+                      onChange={(e) => handleInputChange(e, index, "adults")}
                     />
                   </div>
                 </form>
               </div>
             </div>
-          </>
-        ))}
+          ))}
 
-        {infantShow && (
-          <>
-            <h1 className="w-full text-center text-2xl pt-10">
-              Infant Booking
-            </h1>
-            {Array.from({ length: incount }).map((_, index) => (
-              <div
-                key={index}
-                className="bookingForm mt-10 shadow-md w-full d-flex justify-evenly items-center pl-8 pr-8 pt-3 pb-3 border"
-              >
-                <div className="dropdown d-flex justify-between items-center w-25 gap-5">
-                  <div className="people w-full">
-                    <MDBDropdown className="">
-                      <MDBDropdownToggle className="bg-dark w-full">
-                        Infant
-                      </MDBDropdownToggle>
-                      <MDBDropdownMenu>
-                        <MDBDropdownItem link>Infant</MDBDropdownItem>
-                      </MDBDropdownMenu>
-                    </MDBDropdown>
+          {childCountData > 0 && (
+            <>
+              <h1 className="w-full text-center text-2xl pt-10">Child Booking</h1>
+              {formData.children.map((_, index) => (
+                <div
+                  key={index}
+                  className="bookingForm mt-10 shadow-md w-full d-flex justify-evenly items-center pl-8 pr-8 pt-3 pb-3 border"
+                >
+                  <div className="dropdown d-flex justify-between items-center w-25 gap-5">
+                    <div className="people w-full">
+                      <MDBDropdown className="">
+                        <MDBDropdownToggle className="bg-dark w-full">
+                          Child
+                        </MDBDropdownToggle>
+                        <MDBDropdownMenu>
+                          <MDBDropdownItem link>Child</MDBDropdownItem>
+                        </MDBDropdownMenu>
+                      </MDBDropdown>
+                    </div>
+                  </div>
+                  <div className="form w-full d-flex justify-evenly ">
+                    <form className="d-flex justify-between items-center gap-12">
+                      <div className="mb-3 w-50">
+                        <label
+                          htmlFor={`titleInputChild${index}`}
+                          className="form-label"
+                        >
+                          Title
+                        </label>
+                        <select
+                          className="form-select"
+                          id={`titleInputChild${index}`}
+                          name="title"
+                          onChange={(e) =>
+                            handleInputChange(e, index, "children")
+                          }
+                        >
+                          <option value="">Select</option>
+                          <option value="Mstr.">Mstr.</option>
+                          <option value="Miss">Miss</option>
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor={`firstNameInputChild${index}`}
+                          className="form-label"
+                        >
+                          First Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id={`firstNameInputChild${index}`}
+                          name="firstName"
+                          onChange={(e) =>
+                            handleInputChange(e, index, "children")
+                          }
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor={`lastNameInputChild${index}`}
+                          className="form-label"
+                        >
+                          Last Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id={`lastNameInputChild${index}`}
+                          name="lastName"
+                          onChange={(e) =>
+                            handleInputChange(e, index, "children")
+                          }
+                        />
+                      </div>
+                    </form>
                   </div>
                 </div>
-                <div className="form w-full d-flex justify-evenly">
-                  <form className="d-flex justify-between items-center gap-12">
-                    <div className="mb-3 w-50">
-                      <label
-                        htmlFor={`titleInputInfant${index}`}
-                        className="form-label"
-                      >
-                        Title
-                      </label>
-                      <select
-                        className="form-select"
-                        id={`titleInputInfant${index}`}
-                        name="title"
-                        onChange={(e) => handleInputChange(e, index, "infants")}
-                      >
-                        <option value="">Select</option>
-                        <option value="Mstr.">Mstr.</option>
-                        <option value="Miss">Miss</option>
-                      </select>
+              ))}
+            </>
+          )}
+
+          {infantShow && (
+            <>
+              <h1 className="w-full text-center text-2xl pt-10">
+                Infant Booking
+              </h1>
+              {formData.infants.map((_, index) => (
+                <div
+                  key={index}
+                  className="bookingForm mt-10 shadow-md w-full d-flex justify-evenly items-center pl-8 pr-8 pt-3 pb-3 border"
+                >
+                  <div className="dropdown d-flex justify-between items-center w-25 gap-5">
+                    <div className="people w-full">
+                      <MDBDropdown className="">
+                        <MDBDropdownToggle className="bg-dark w-full">
+                          Infant
+                        </MDBDropdownToggle>
+                        <MDBDropdownMenu>
+                          <MDBDropdownItem link>Infant</MDBDropdownItem>
+                        </MDBDropdownMenu>
+                      </MDBDropdown>
                     </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor={`firstNameInputInfant${index}`}
-                        className="form-label"
-                      >
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id={`firstNameInputInfant${index}`}
-                        name="firstName"
-                        onChange={(e) => handleInputChange(e, index, "infants")}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor={`lastNameInputInfant${index}`}
-                        className="form-label"
-                      >
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id={`lastNameInputInfant${index}`}
-                        name="lastName"
-                        onChange={(e) => handleInputChange(e, index, "infants")}
-                      />
-                    </div>
-                  </form>
+                  </div>
+                  <div className="form w-full d-flex justify-evenly">
+                    <form className="d-flex justify-between items-center gap-12">
+                      <div className="mb-3 w-50">
+                        <label
+                          htmlFor={`titleInputInfant${index}`}
+                          className="form-label"
+                        >
+                          Title
+                        </label>
+                        <select
+                          className="form-select"
+                          id={`titleInputInfant${index}`}
+                          name="title"
+                          onChange={(e) =>
+                            handleInputChange(e, index, "infants")
+                          }
+                        >
+                          <option value="">Select</option>
+                          <option value="Mstr.">Mstr.</option>
+                          <option value="Miss">Miss</option>
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor={`firstNameInputInfant${index}`}
+                          className="form-label"
+                        >
+                          First Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id={`firstNameInputInfant${index}`}
+                          name="firstName"
+                          onChange={(e) =>
+                            handleInputChange(e, index, "infants")
+                          }
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor={`lastNameInputInfant${index}`}
+                          className="form-label"
+                        >
+                          Last Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id={`lastNameInputInfant${index}`}
+                          name="lastName"
+                          onChange={(e) =>
+                            handleInputChange(e, index, "infants")
+                          }
+                        />
+                      </div>
+                    </form>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </>
-        )}
+              ))}
+            </>
+          )}
 
-        <div className="infant pt-10">
-          <button
-            className="btn btn-outline-primary uppercase w-72 text-lg text-blue-500 font-bold hover:text-black hover:border-black"
-            onClick={handleInfant}
-          >
-            add infant - AQP1750
-          </button>
-        </div>
-
-        <div className="checkBox mt-10 bg-success d-flex justify-center items-center">
-          <div className="checkboxes">
-            <ul className="list-group">
-              <li className="list-group-item">
-                <input
-                  className="form-check-input me-1"
-                  type="checkbox"
-                  id="checkbox"
-                  onChange={handleCheckboxChange}
-                />
-                <label className="form-check-label" htmlFor="checkbox">
-                  I have READ and AGREE to the Terms & Conditions
-                </label>
-              </li>
-            </ul>
-          </div>
-          <div className="confirmButton w-25 p-4">
+          <div className="infant pt-10">
             <button
-              className="btn btn-primary uppercase"
-              onClick={handleConfirmBooking}
+              className="btn btn-outline-primary uppercase w-72 text-lg text-blue-500 font-bold hover:text-black hover:border-black"
+              onClick={handleInfant}
             >
-              confirm booking
+              add infant - AQP1750
             </button>
+          </div>
+
+          <div className="checkBox mt-10 bg-success d-flex justify-center items-center">
+            <div className="checkboxes">
+              <ul className="list-group">
+                <li className="list-group-item">
+                  <input
+                    className="form-check-input me-1"
+                    type="checkbox"
+                    id="checkbox"
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox">
+                    I have READ and AGREE to the Terms & Conditions
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div className="confirmButton w-25 p-4">
+              <button
+                className="btn btn-primary uppercase"
+                onClick={handleConfirmBooking}
+              >
+                confirm booking
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

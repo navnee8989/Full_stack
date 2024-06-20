@@ -15,13 +15,19 @@ const DashBoard = ({ state }) => {
   const location = useLocation();
   const user = location.state?.user || {};
 
+  const userDetails = useSelector((state) => state.flight.loginDetails);
+
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
   };
+
+  const handleRedirect = ()=>{
+    navigate("/user")
+  }
   return (
     <>
-      <div className="d-container  d-flex ">
+      <div className="  d-flex bg-amber-100">
         <div className="wrepper">
           <div className="sidebar  bg-blue-200 ">
             <div className="user d-flex flex-col cursor-pointer">
@@ -62,12 +68,29 @@ const DashBoard = ({ state }) => {
             </div>
           </div>
         </div>
-        <div className="View    ">
-          <div className="navbar w-full pt-3 pb-8 bg-blue-200">
+        <div className="View m-0 p-0 ">
+          <div className="navbar bg-blue-200">
             <Navbar />
           </div>
 
-          <div className="veiw_data w-full">
+          <div className="boxes pt-12 w-75 mx-auto d-flex gap-10">
+            <div className="shadow-md shrink-0 h-46 w-64    bg-blue-200 rounded-xl" onClick={handleRedirect}>
+              <div className="countUser text-2xl  p-2 rounded-s-md">{userDetails.length}</div>
+              <div className="userName">
+
+              </div>
+            </div>
+            <div className="shadow-md shrink-0 h-46 w-64 p-4  text-8xl d-flex justify-center items-center">
+              2
+            </div>
+            <div className="shadow-md shrink-0 h-46 w-64 p-4  text-8xl d-flex justify-center items-center">
+              2
+            </div>
+            <div className="shadow-md shrink-0 h-46 w-64 p-4  text-8xl d-flex justify-center items-center">
+              2
+            </div>
+          </div>
+          <div className="veiw_data w-full ">
             <Outlet />
           </div>
         </div>

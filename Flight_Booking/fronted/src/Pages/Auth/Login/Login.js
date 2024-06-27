@@ -84,7 +84,7 @@ const Login = () => {
 
           localStorage.setItem("token", token);
           toast.success("Login SuccessFull");
-          navigate("/dashboard", { state: { user: response.data.user } });
+          navigate("/booking", { state: { user: response.data.user } });
         }
       })
       .catch((error) => {

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { MdOutlineFlight } from "react-icons/md";
-import "./Avilibity.css";
 import { FaIoxhost } from "react-icons/fa";
 import {
   MDBDropdown,
@@ -8,13 +7,14 @@ import {
   MDBDropdownToggle,
   MDBDropdownItem,
 } from "mdb-react-ui-kit";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import Navbar from "../../component/Navbar";
+import { FetchAPI } from "../../redux/features/flightSlice";
 
-const Availability = () => {
+const Availability = ({ setBKID }) => {
   const [infantShow, setInfantShow] = useState(false);
   const [formData, setFormData] = useState({
     adults: [],
@@ -24,20 +24,16 @@ const Availability = () => {
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const AllFlightData = location.state?.ticket;
+  const [name, setName] = useState();
+  const dispatch = useDispatch();
+
   const adultCountData = useSelector((state) => state.flight.adultCountData);
   const childCountData = useSelector((state) => state.flight.childCountData);
   const infantCountData = useSelector((state) => state.flight.infantCountData);
-  const location = useLocation();
-  const AllFlightData = location.state?.ticket;
 
-  useEffect(() => {
-    setFormData({
-      ...formData,
-      adults: Array(adultCountData).fill({}),
-      children: Array(childCountData).fill({}),
-      infants: Array(infantCountData).fill({}),
-    });
-  }, [adultCountData, childCountData, infantCountData]);
+  const [incount, setincout] = useState(infantCountData);
 
   const handleInputChange = (e, index, type) => {
     const { name, value } = e.target;
@@ -62,28 +58,36 @@ const Availability = () => {
   };
 
   const handleInfant = () => {
-    setFormData((prevState) => ({
-      ...prevState,
-      infants: [...prevState.infants, {}],
-    }));
+    setincout(incount + 1);
     setInfantShow(true);
   };
 
+  //  formData.adults.forEach((names) => {
+  //     if (names === "") {
+  //       setName(null);
+  //     } else {
+  //       setName(`${names.first_name} ${names.last_name}`);
+  //     }
+  //   });
+
+  // console.log(FullName);
   const handleConfirmBooking = async () => {
     if (!formData.agreeToTerms) {
       toast.error("You must agree to the terms and conditions.");
       return;
     }
 
-    const totalPax =
-      Number(adultCountData) + Number(childCountData) + Number(formData.infants.length);
+    const adultCount = Number(adultCountData);
+    const childCount = Number(childCountData);
+    const infantCount = Number(incount);
+    const totalPax = adultCount + childCount + infantCount;
 
     const data = JSON.stringify({
       ticket_id: AllFlightData?.ticket_id,
       total_pax: totalPax,
-      adult: adultCountData,
-      child: childCountData,
-      infant: formData.infants.length,
+      adult: adultCount,
+      child: childCount,
+      infant: infantCount,
       adult_info: formData.adults.map((adult) => ({
         title: adult.title,
         first_name: adult.firstName,
@@ -104,7 +108,8 @@ const Availability = () => {
     try {
       const response = await axios.post("/api/book", data, {
         headers: {
-          "api-key": "NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlFRYjhLVjNFMW9UV05RY1NWL0Vtcm9UYXFKTSs5dkZvaHo0RzM4WWhwTDhsamNqR3pPN1dJSHhVQ2pCSzNRcW0=",
+          "api-key":
+            "NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlFRYjhLVjNFMW9UV05RY1NWL0Vtcm9UYXFKTSs5dkZvaHo0RzM4WWhwTDhsamNqR3pPN1dJSHhVQ2pCSzNRcW0=",
           Authorization: `${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
@@ -112,7 +117,34 @@ const Availability = () => {
 
       if (response?.data) {
         toast.success("Booking confirmed!");
-        navigate("/formpayment", { state: { data: response.data } });
+
+        navigate("/formpayment", {
+          state: { data: response.data, AllFlightData, formData },
+        });
+
+        console.log(response.data);
+        const { booking_id } = response.data;
+        try {
+          const data = {
+            bookingId: booking_id,
+          };
+          const response = await axios.post(
+            "http://localhost:5000/flight/ticket_details",
+            data,
+            {
+              headers: {
+                "api-key":
+                  "NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlFRYjhLVjNFMW9UV05RY1NWL0Vtcm9UYXFKTSs5dkZvaHo0RzM4WWhwTDhsamNqR3pPN1dJSHhVQ2pCSzNRcW0=",
+                Authorization: `${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        } catch (error) {
+          console.log(error);
+          toast.error("Error While Storing Data into the Db");
+        }
+        dispatch(FetchAPI(booking_id));
       } else {
         toast.error("Error while booking the ticket.");
       }
@@ -121,6 +153,8 @@ const Availability = () => {
     }
   };
 
+  // const BookignRedux = useSelector((state)=> state.flight.BookingDetails)
+  // console.log(BookignRedux);
   return (
     <>
       <Navbar />
@@ -161,7 +195,7 @@ const Availability = () => {
           </div>
 
           <h1 className="w-full text-center text-2xl pt-10">Adult Booking</h1>
-          {formData.adults.map((_, index) => (
+          {Array.from({ length: adultCountData }).map((_, index) => (
             <div
               key={index}
               className="bookingForm mt-10 shadow-md w-full d-flex justify-between items-center pl-8 pr-8 pt-3 pb-3 border"
@@ -235,8 +269,10 @@ const Availability = () => {
 
           {childCountData > 0 && (
             <>
-              <h1 className="w-full text-center text-2xl pt-10">Child Booking</h1>
-              {formData.children.map((_, index) => (
+              <h1 className="w-full text-center text-2xl pt-10">
+                Child Booking
+              </h1>
+              {Array.from({ length: childCountData }).map((_, index) => (
                 <div
                   key={index}
                   className="bookingForm mt-10 shadow-md w-full d-flex justify-evenly items-center pl-8 pr-8 pt-3 pb-3 border"
@@ -253,7 +289,7 @@ const Availability = () => {
                       </MDBDropdown>
                     </div>
                   </div>
-                  <div className="form w-full d-flex justify-evenly ">
+                  <div className="form w-full d-flex justify-evenly">
                     <form className="d-flex justify-between items-center gap-12">
                       <div className="mb-3 w-50">
                         <label
@@ -316,12 +352,12 @@ const Availability = () => {
             </>
           )}
 
-          {infantShow && (
+          {incount > 0 && (
             <>
               <h1 className="w-full text-center text-2xl pt-10">
                 Infant Booking
               </h1>
-              {formData.infants.map((_, index) => (
+              {Array.from({ length: incount }).map((_, index) => (
                 <div
                   key={index}
                   className="bookingForm mt-10 shadow-md w-full d-flex justify-evenly items-center pl-8 pr-8 pt-3 pb-3 border"

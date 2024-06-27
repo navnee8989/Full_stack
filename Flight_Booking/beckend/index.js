@@ -16,11 +16,11 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 // Routes
-app.use("/api/payment", paymentRoutes); 
+app.use("/flight", paymentRoutes); 
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error(err);
   res.status(500).send("Something broke!");
 });
 

@@ -28,7 +28,7 @@ const Booking = () => {
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [showTickets, setShowTickets] = useState([]);
   const [availabilityDates, setAvailabilityDates] = useState([]);
-  const [noTicket,setnoTickets]=useState(false)
+  const [noTicket, setnoTickets] = useState(false);
   const [disabledDates, setDisabledDates] = useState([]);
   const [formData, setFormData] = useState({
     origin: "",
@@ -115,7 +115,7 @@ const Booking = () => {
               "api-key":
                 "NTMzNDUwMDpBSVJJUSBURVNUIEFQSToxODkxOTMwMDM1OTk2OlFRYjhLVjNFMW9UV05RY1NWL0Vtcm9UYXFKTSs5dkZvaHo0RzM4WWhwTDhsamNqR3pPN1dJSHhVQ2pCSzNRcW0=",
               Authorization: `${localStorage.getItem("token")}`,
-              withCredentials: true,
+              "Content-Type": "application/json",
             },
           });
           if (response.data && response.data.data) {
@@ -175,7 +175,7 @@ const Booking = () => {
         setAvailabilityDates([]);
         setDisabledDates([]);
       } else {
-        setnoTickets(true)
+        setnoTickets(true);
         const dates = response.data.data;
 
         // Format dates to YYYY/MM/DD
@@ -216,21 +216,23 @@ const Booking = () => {
       infant: formData.infants,
       airline_code: formData.airline_code,
     });
+    // console.log(formData);
     if (noTicket === false) {
-      toast.info(`Thare is NO Routes Find in Your Location ${formData.origin} TO  ${formData.destination}`, {
-      
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        });
-    }else{
-
+      toast.info(
+        `Thare is NO Routes Find in Your Location ${formData.origin} TO  ${formData.destination}`,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+        }
+      );
+    } else {
       try {
         const response = await axios.post("/api/search", data, {
           headers: {
@@ -242,7 +244,6 @@ const Booking = () => {
         });
         if (response.data && response.data.data) {
           console.log(response.data.data);
-          dispatch(setallFlightData(response.data.data));
           setShowTickets(response.data.data);
           toast.success(
             `Found ${response.data.data.length} results for your flight search`,
@@ -299,247 +300,246 @@ const Booking = () => {
 
   return (
     <>
-  <Navbar />
-    <div className="booking">
-      <div className="container">
-        <div className="tabs">
-          <button className="one">One Way</button>
-          <button className="two">Round Trip</button>
-        </div>
+      <Navbar />
+      <div className="booking">
+        <div className="container">
+          <div className="tabs">
+            <button className="one">One Way</button>
+            <button className="two">Round Trip</button>
+          </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="flex md:flex-row">
-            <div className="py-1.5 px-2.5 flex border-r-2 justify-center  item-start gap-2">
-              <div className="input-group mb-3  ">
-                <div className="input">
-                  <h1 className="text-center ">Origin</h1>
-                  <input
-                    type="text"
-                    className="form-control w-full"
-                    placeholder="Enter Origin"
-                    name="originName"
-                    value={formData.originName}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="showBar">
-                  {originSuggestions.length > 0 && (
-                    <ul className="dropdown-menu show origin-dropdown">
-                      {originSuggestions.map((suggestion, index) => (
-                        <li key={index}>
-                          <button
-                            className="dropdown-item"
-                            type="button"
-                            onClick={() => {
-                              setFormData({
-                                ...formData,
-                                origin: suggestion,
-                              });
-                              setOriginSuggestions([]);
-                              handleOrigin(suggestion);
-                            }}
-                          >
-                            {suggestion}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-
-              <div className="input-group mb-3">
-                <div className="input">
-                  <h1 className="text-center ">Destination</h1>
-
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Destination"
-                    name="destinationName"
-                    value={formData.destinationName}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="showBar">
-                  {destinationSuggestions.length > 0 && (
-                    <ul className="dropdown-menu show origin-dropdown">
-                      {destinationSuggestions.map((dstsuggestion, index) => (
-                        <li key={index}>
-                          <button
-                            className="dropdown-item"
-                            type="button"
-                            onClick={() => {
-                              setFormData({
-                                ...formData,
-                                destination: dstsuggestion,
-                              });
-                              setDestinationSuggestions([]);
-                              handleDestination(dstsuggestion);
-                            }}
-                          >
-                            {dstsuggestion}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="py-1.5 px-2.5 flex-1 border-r-2">
-              <p>Travel Date</p>
-              <CustomDatePicker
-                selectedDate={formData.departure_date}
-                handleChange={handleDateChange}
-                disabledDates={disabledDates}
-              
-              />
-              {disabledDates.length > 0 && (
-                <p className="text-red-500 text-xs mt-1">
-                  Unavailable for selected route
-                </p>
-              )}
-            </div>
-
-            <div className="py-1.5 px-2.5 flex-1 border-r-2">
-              <p>PAX SIZE</p>
-              <div className="pax-dropdown">
-                <button
-                  type="button"
-                  className="outline-none w-full"
-                  onClick={() => setPaxDropdownOpen(!paxDropdownOpen)}
-                >
-                  <strong>PAX SIZE</strong>{" "}
-                  <strong>
-                    <FaArrowDown />
-                  </strong>
-                </button>
-                {paxDropdownOpen && (
-                  <div className="pax-dropdown-content">
-                    <div className="py-1.5">
-                      <p>Adults</p>
-                      <input
-                        type="number"
-                        className="outline-none px-2 py-2 w-full"
-                        name="adults"
-                        value={formData.adults}
-                        onChange={handleInputChange}
-                        min={1}
-                        max={5}
-                        required
-                      />
-                    </div>
-                    <div className="py-1.5">
-                      <p>Children</p>
-                      <input
-                        type="number"
-                        className="outline-none px-2 py-2 w-full"
-                        name="children"
-                        value={formData.children}
-                        onChange={handleInputChange}
-                        min={0}
-                        max={5}
-                        required
-                      />
-                    </div>
-                    <div className="py-1.5">
-                      <p>Infants</p>
-                      <input
-                        type="number"
-                        className="outline-none px-2 py-2 w-full"
-                        name="infants"
-                        value={formData.infants}
-                        onChange={handleInputChange}
-                        min={0}
-                        max={5}
-                        required
-                      />
-                    </div>
+          <form onSubmit={handleSubmit}>
+            <div className="flex md:flex-row">
+              <div className="py-1.5 px-2.5 flex border-r-2 justify-center  item-start gap-2">
+                <div className="input-group mb-3  ">
+                  <div className="input">
+                    <h1 className="text-center ">Origin</h1>
+                    <input
+                      type="text"
+                      className="form-control w-full"
+                      placeholder="Enter Origin"
+                      name="originName"
+                      value={formData.originName}
+                      onChange={handleInputChange}
+                    />
                   </div>
+                  <div className="showBar">
+                    {originSuggestions.length > 0 && (
+                      <ul className="dropdown-menu show origin-dropdown">
+                        {originSuggestions.map((suggestion, index) => (
+                          <li key={index}>
+                            <button
+                              className="dropdown-item"
+                              type="button"
+                              onClick={() => {
+                                setFormData({
+                                  ...formData,
+                                  origin: suggestion,
+                                });
+                                setOriginSuggestions([]);
+                                handleOrigin(suggestion);
+                              }}
+                            >
+                              {suggestion}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+
+                <div className="input-group mb-3">
+                  <div className="input">
+                    <h1 className="text-center ">Destination</h1>
+
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Destination"
+                      name="destinationName"
+                      value={formData.destinationName}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="showBar">
+                    {destinationSuggestions.length > 0 && (
+                      <ul className="dropdown-menu show origin-dropdown">
+                        {destinationSuggestions.map((dstsuggestion, index) => (
+                          <li key={index}>
+                            <button
+                              className="dropdown-item"
+                              type="button"
+                              onClick={() => {
+                                setFormData({
+                                  ...formData,
+                                  destination: dstsuggestion,
+                                });
+                                setDestinationSuggestions([]);
+                                handleDestination(dstsuggestion);
+                              }}
+                            >
+                              {dstsuggestion}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="py-1.5 px-2.5 flex-1 border-r-2">
+                <p>Travel Date</p>
+                <CustomDatePicker
+                  selectedDate={formData.departure_date}
+                  handleChange={handleDateChange}
+                  disabledDates={disabledDates}
+                />
+                {disabledDates.length > 0 && (
+                  <p className="text-red-500 text-xs mt-1">
+                    Unavailable for selected route
+                  </p>
                 )}
               </div>
-            </div>
 
-            <div className="btn_div">
-              <button className="bg-indigo-500 text-white" type="submit">
-                <span className="text-sm">
-                  Search <FaSearch />
-                </span>
-              </button>
+              <div className="py-1.5 px-2.5 flex-1 border-r-2">
+                <p>PAX SIZE</p>
+                <div className="pax-dropdown">
+                  <button
+                    type="button"
+                    className="outline-none w-full"
+                    onClick={() => setPaxDropdownOpen(!paxDropdownOpen)}
+                  >
+                    <strong>PAX SIZE</strong>{" "}
+                    <strong>
+                      <FaArrowDown />
+                    </strong>
+                  </button>
+                  {paxDropdownOpen && (
+                    <div className="pax-dropdown-content">
+                      <div className="py-1.5">
+                        <p>Adults</p>
+                        <input
+                          type="number"
+                          className="outline-none px-2 py-2 w-full"
+                          name="adults"
+                          value={formData.adults}
+                          onChange={handleInputChange}
+                          min={1}
+                          max={5}
+                          required
+                        />
+                      </div>
+                      <div className="py-1.5">
+                        <p>Children</p>
+                        <input
+                          type="number"
+                          className="outline-none px-2 py-2 w-full"
+                          name="children"
+                          value={formData.children}
+                          onChange={handleInputChange}
+                          min={0}
+                          max={5}
+                          required
+                        />
+                      </div>
+                      <div className="py-1.5">
+                        <p>Infants</p>
+                        <input
+                          type="number"
+                          className="outline-none px-2 py-2 w-full"
+                          name="infants"
+                          value={formData.infants}
+                          onChange={handleInputChange}
+                          min={0}
+                          max={5}
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="btn_div">
+                <button className="bg-indigo-500 text-white" type="submit">
+                  <span className="text-sm">
+                    Search <FaSearch />
+                  </span>
+                </button>
+              </div>
             </div>
+          </form>
+          <hr />
+          <div className="page_move">
+            <button className="prev">
+              <div className="lefticon">
+                <MdKeyboardDoubleArrowLeft />
+              </div>
+              <strong>PREV DAY</strong>
+            </button>
+            <button className="next">
+              <strong>NEXT DAY</strong>
+              <div className="righticon">
+                <MdKeyboardDoubleArrowRight />
+              </div>
+            </button>
           </div>
-        </form>
-        <hr />
-        <div className="page_move">
-          <button className="prev">
-            <div className="lefticon">
-              <MdKeyboardDoubleArrowLeft />
-            </div>
-            <strong>PREV DAY</strong>
-          </button>
-          <button className="next">
-            <strong>NEXT DAY</strong>
-            <div className="righticon">
-              <MdKeyboardDoubleArrowRight />
-            </div>
-          </button>
+        </div>
+
+        <div className="ShowALlTickits pt-20  ">
+          <table className="table ">
+            <thead className="bg-success font-bold">
+              <tr>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Airline</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Arrival Date</th>
+                <th>Arrival Time</th>
+                <th>Flight Number</th>
+                <th>Flight Route</th>
+                <th>Pax</th>
+                <th>Price</th>
+                <th>Booking</th>
+              </tr>
+            </thead>
+            <tbody>
+              {showTickets.length > 0 ? (
+                showTickets.map((ticket, index) => (
+                  <tr key={index}>
+                    <td>{ticket.origin}</td>
+                    <td>{ticket.destination}</td>
+                    <td>{ticket.airline}</td>
+                    <td>{ticket.departure_date}</td>
+                    <td>{ticket.departure_time}</td>
+                    <td>{ticket.arival_date}</td>
+                    <td>{ticket.arival_time}</td>
+                    <td>{ticket.flight_number}</td>
+                    <td>{ticket.flight_route}</td>
+                    <td>{ticket.pax}</td>
+                    <td>{ticket.price}</td>
+                    <td>
+                      <button
+                        className="btn btn-success"
+                        onClick={handleBooking(index)}
+                      >
+                        Book
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="13">No tickets available</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <div className="ShowALlTickits pt-20  ">
-        <table className="table ">
-          <thead className="bg-success font-bold">
-            <tr>
-              <th>Origin</th>
-              <th>Destination</th>
-              <th>Airline</th>
-              <th>Departure Date</th>
-              <th>Departure Time</th>
-              <th>Arrival Date</th>
-              <th>Arrival Time</th>
-              <th>Flight Number</th>
-              <th>Flight Route</th>
-              <th>Pax</th>
-              <th>Price</th>
-              <th>Booking</th>
-            </tr>
-          </thead>
-          <tbody>
-            {showTickets.length > 0 ? (
-              showTickets.map((ticket, index) => (
-                <tr key={index}>
-                  <td>{ticket.origin}</td>
-                  <td>{ticket.destination}</td>
-                  <td>{ticket.airline}</td>
-                  <td>{ticket.departure_date}</td>
-                  <td>{ticket.departure_time}</td>
-                  <td>{ticket.arival_date}</td>
-                  <td>{ticket.arival_time}</td>
-                  <td>{ticket.flight_number}</td>
-                  <td>{ticket.flight_route}</td>
-                  <td>{ticket.pax}</td>
-                  <td>{ticket.price}</td>
-                  <td>
-                    <button
-                      className="btn btn-success"
-                      onClick={handleBooking(index)}
-                    >
-                      Book
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="13">No tickets available</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
     </>
   );
 };
